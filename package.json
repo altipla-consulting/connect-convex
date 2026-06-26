@@ -2,6 +2,13 @@
   "name": "connect-convex",
   "type": "module",
   "version": "0.0.0",
+  "scripts": {
+    "build": "obuild",
+    "lint": "tsc --noEmit && oxlint",
+    "fix": "oxlint --fix",
+    "test": "pnpm run lint",
+    "prepublishOnly": "pnpm run build"
+  },
   "description": "Register Connect services in Convex.",
   "author": "Altípla Consulting",
   "license": "MIT",
@@ -20,12 +27,8 @@
       "import": "./dist/index.mjs"
     }
   },
-  "scripts": {
-    "build": "obuild",
-    "lint": "tsc --noEmit && oxlint",
-    "fix": "oxlint --fix",
-    "test": "pnpm run lint",
-    "prepublishOnly": "pnpm run build"
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.11.0",
