@@ -1,0 +1,46 @@
+{
+  "name": "connect-convex",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Register Connect services in Convex.",
+  "author": "Altípla Consulting",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/altipla-consulting/connect-convex"
+  },
+  "homepage": "https://github.com/altipla-consulting/connect-convex",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "obuild",
+    "lint": "tsc --noEmit && oxlint",
+    "fix": "oxlint --fix",
+    "test": "pnpm run lint",
+    "prepublishOnly": "pnpm run build"
+  },
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.11.0",
+    "@connectrpc/connect": "^2.1.1",
+    "convex": "^1.38.0"
+  },
+  "devDependencies": {
+    "@altipla/oxlint-config": "^0.1.6",
+    "@types/node": "^25.5.0",
+    "@vue/tsconfig": "^0.9.1",
+    "np": "^11.2.1",
+    "obuild": "^0.4.37",
+    "oxlint": "^1.57.0",
+    "oxlint-tsgolint": "^0.18.1",
+    "prettier": "^3.8.1",
+    "typescript": "^5.9.2"
+  }
+}

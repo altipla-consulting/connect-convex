@@ -1,0 +1,13 @@
+{
+  "extends": "@vue/tsconfig/tsconfig.json",
+  "compilerOptions": {
+    "lib": ["es2022", "dom"],
+    "strict": true,
+    "noImplicitAny": true,
+    "forceConsistentCasingInFileNames": true,
+    "noUncheckedIndexedAccess": false,
+    "types": []
+  },
+  "include": ["src/**/*.ts", "build.config.ts"],
+  "exclude": ["node_modules", "dist"]
+}
