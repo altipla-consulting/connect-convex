@@ -1,7 +1,7 @@
 {
   "name": "connect-convex",
   "type": "module",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Register Connect services in Convex.",
   "author": "Altípla Consulting",
   "license": "MIT",
