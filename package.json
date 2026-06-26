@@ -36,7 +36,6 @@
     "@altipla/oxlint-config": "^0.1.6",
     "@types/node": "^25.5.0",
     "@vue/tsconfig": "^0.9.1",
-    "np": "^11.2.1",
     "obuild": "^0.4.37",
     "oxlint": "^1.57.0",
     "oxlint-tsgolint": "^0.18.1",
