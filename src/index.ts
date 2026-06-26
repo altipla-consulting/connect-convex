@@ -6,7 +6,7 @@ import { codeToHttpStatus, errorToJson } from '@connectrpc/connect/protocol-conn
 
 type ActionCtx = GenericActionCtx<GenericDataModel>
 
-export function serializeError(err: ConnectError) {
+function serializeError(err: ConnectError) {
   return new Response(JSON.stringify(errorToJson(err, {})), {
     status: codeToHttpStatus(err.code),
     headers: { 'Content-Type': 'application/connect+proto' },
