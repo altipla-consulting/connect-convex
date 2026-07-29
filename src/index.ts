@@ -74,7 +74,7 @@ export function registerService<T extends GenServiceMethods>(http: HttpRouter, s
 
           if (contentType === 'application/connect+json' || contentType === 'application/json') {
             return new Response(toJsonString(method.output, output as any), {
-              headers: { 'Content-Type': 'application/connect+json' },
+              headers: { 'Content-Type': contentType },
             })
           } else {
             return new Response(toBinary(method.output, output as any), {
