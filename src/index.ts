@@ -9,7 +9,7 @@ type ActionCtx = GenericActionCtx<GenericDataModel>
 function serializeError(err: ConnectError) {
   return new Response(JSON.stringify(errorToJson(err, {})), {
     status: codeToHttpStatus(err.code),
-    headers: { 'Content-Type': 'application/connect+proto' },
+    headers: { 'Content-Type': 'application/json' },
   })
 }
 
