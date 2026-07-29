@@ -42,13 +42,13 @@ export function registerService<T extends GenServiceMethods>(http: HttpRouter, s
         let input: any
 
         const contentType = req.headers.get('Content-Type')
-        if (contentType === 'application/connect+json' || contentType === 'application/json') {
+        if (contentType === 'application/json') {
           try {
             input = fromJsonString(method.input, await req.text())
           } catch (err: unknown) {
             return serializeError(ConnectError.from(err, Code.InvalidArgument))
           }
-        } else if (contentType === 'application/connect+proto' || contentType === 'application/proto') {
+        } else if (contentType === 'application/proto') {
           try {
             input = fromBinary(method.input, new Uint8Array(await req.arrayBuffer()))
           } catch (err: unknown) {
@@ -72,7 +72,7 @@ export function registerService<T extends GenServiceMethods>(http: HttpRouter, s
             raw: req,
           })
 
-          if (contentType === 'application/connect+json' || contentType === 'application/json') {
+          if (contentType === 'application/json') {
             return new Response(toJsonString(method.output, output as any), {
               headers: { 'Content-Type': contentType },
             })
