@@ -1,6 +1,6 @@
 import { httpActionGeneric, type GenericActionCtx, type GenericDataModel, type HttpRouter } from 'convex/server'
 import type { GenService, GenServiceMethods } from '@bufbuild/protobuf/codegenv2'
-import { fromJsonString, toJsonString, type DescMethod, type MessageShape } from '@bufbuild/protobuf'
+import { fromBinary, fromJsonString, toBinary, toJsonString, type DescMethod, type MessageShape } from '@bufbuild/protobuf'
 import { Code, ConnectError } from '@connectrpc/connect'
 import { codeToHttpStatus, errorToJson } from '@connectrpc/connect/protocol-connect'
 
@@ -39,16 +39,23 @@ export function registerService<T extends GenServiceMethods>(http: HttpRouter, s
       method: 'POST',
       path: `/${service.typeName}/${method.name}`,
       handler: httpActionGeneric(async (ctx, req) => {
-        const contentType = req.headers.get('Content-Type')
-        if (contentType !== 'application/connect+json' && contentType !== 'application/json') {
-          return new Response(`invalid content type ${contentType}`, { status: 400 })
-        }
-
         let input: any
-        try {
-          input = fromJsonString(method.input, await req.text())
-        } catch (err: unknown) {
-          return serializeError(ConnectError.from(err, Code.InvalidArgument))
+
+        const contentType = req.headers.get('Content-Type')
+        if (contentType === 'application/connect+json' || contentType === 'application/json') {
+          try {
+            input = fromJsonString(method.input, await req.text())
+          } catch (err: unknown) {
+            return serializeError(ConnectError.from(err, Code.InvalidArgument))
+          }
+        } else if (contentType === 'application/connect+proto') {
+          try {
+            input = fromBinary(method.input, new Uint8Array(await req.arrayBuffer()))
+          } catch (err: unknown) {
+            return serializeError(ConnectError.from(err, Code.InvalidArgument))
+          }
+        } else {
+          return new Response(`invalid content type ${contentType}`, { status: 400 })
         }
 
         try {
@@ -64,9 +71,16 @@ export function registerService<T extends GenServiceMethods>(http: HttpRouter, s
             header: req.headers,
             raw: req,
           })
-          return new Response(toJsonString(method.output, output as any), {
-            headers: { 'Content-Type': 'application/connect+proto' },
-          })
+
+          if (contentType === 'application/connect+json' || contentType === 'application/json') {
+            return new Response(toJsonString(method.output, output as any), {
+              headers: { 'Content-Type': 'application/connect+json' },
+            })
+          } else {
+            return new Response(toBinary(method.output, output as any), {
+              headers: { 'Content-Type': 'application/connect+proto' },
+            })
+          }
         } catch (err: unknown) {
           if (err instanceof ConnectError) {
             return serializeError(err)
