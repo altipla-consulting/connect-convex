@@ -1,6 +1,6 @@
 import { httpActionGeneric, type GenericActionCtx, type GenericDataModel, type HttpRouter } from 'convex/server'
 import type { GenService, GenServiceMethods } from '@bufbuild/protobuf/codegenv2'
-import { fromJsonString, toJsonString, type MessageShape } from '@bufbuild/protobuf'
+import { fromJsonString, toJsonString, type DescMethod, type MessageShape } from '@bufbuild/protobuf'
 import { Code, ConnectError } from '@connectrpc/connect'
 import { codeToHttpStatus, errorToJson } from '@connectrpc/connect/protocol-connect'
 
@@ -13,10 +13,32 @@ function serializeError(err: ConnectError) {
   })
 }
 
+export interface InterceptorRequest {
+  service: GenService<GenServiceMethods>
+  method: DescMethod
+  message: unknown
+  header: Headers
+  raw: Request
+}
+
+type AnyHandler = (ctx: ActionCtx, req: InterceptorRequest) => Promise<unknown>
+
+export type Interceptor = (next: AnyHandler) => AnyHandler
+
+export type RegisterServiceOptions = {
+  interceptors?: Interceptor[]
+}
+
 type Methods<T extends GenServiceMethods> = {
   [K in keyof T]: (ctx: ActionCtx, input: MessageShape<T[K]['input']>, req?: Request) => Promise<MessageShape<T[K]['output']>>
 }
-export function registerService<T extends GenServiceMethods>(http: HttpRouter, service: GenService<T>, impl: Methods<T>) {
+
+export function registerService<T extends GenServiceMethods>(
+  http: HttpRouter,
+  service: GenService<T>,
+  impl: Methods<T>,
+  options?: RegisterServiceOptions,
+) {
   for (const method of service.methods) {
     http.route({
       method: 'POST',
@@ -36,8 +58,18 @@ export function registerService<T extends GenServiceMethods>(http: HttpRouter, s
 
         try {
           const implName = method.name.charAt(0).toLowerCase() + method.name.slice(1)
-          const output = await impl[implName](ctx, input)
-          return new Response(toJsonString(method.output, output), {
+          const inner: AnyHandler = async (ctx, interceptorReq) => {
+            return await impl[implName](ctx, interceptorReq.message as any, interceptorReq.raw)
+          }
+          const handler = (options?.interceptors ?? []).reduceRight((next, interceptor) => interceptor(next), inner)
+          const output = await handler(ctx, {
+            service,
+            method,
+            message: input,
+            header: req.headers,
+            raw: req,
+          })
+          return new Response(toJsonString(method.output, output as any), {
             headers: { 'Content-Type': 'application/connect+proto' },
           })
         } catch (err: unknown) {

@@ -59,6 +59,36 @@ export default http
 - RPC names map to camelCase keys in the impl object (`SayHello` → `sayHello`)
 - Throw `ConnectError` from `@connectrpc/connect` for typed RPC errors
 
+### Interceptors
+
+Pass Connect-style interceptors via the optional fourth argument. They wrap every method on the service (first in the array is outermost) and receive the Convex `ActionCtx`:
+
+```ts
+import type { Interceptor } from 'connect-convex'
+import { ConnectError, Code } from '@connectrpc/connect'
+
+const auth: Interceptor = (next) => async (ctx, req) => {
+  const token = req.header.get('Authorization')
+  if (!token) {
+    throw new ConnectError('missing authorization', Code.Unauthenticated)
+  }
+  return await next(ctx, req)
+}
+
+registerService(
+  http,
+  GreeterService,
+  {
+    async sayHello(ctx, { name }) {
+      return { message: `Hello, ${name}!` }
+    },
+  },
+  { interceptors: [auth] },
+)
+```
+
+Throwing a `ConnectError` from an interceptor short-circuits the chain and is returned as a typed RPC error.
+
 Call the endpoint:
 
 ```bash
