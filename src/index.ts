@@ -48,7 +48,7 @@ export function registerService<T extends GenServiceMethods>(http: HttpRouter, s
           } catch (err: unknown) {
             return serializeError(ConnectError.from(err, Code.InvalidArgument))
           }
-        } else if (contentType === 'application/connect+proto') {
+        } else if (contentType === 'application/connect+proto' || contentType === 'application/proto') {
           try {
             input = fromBinary(method.input, new Uint8Array(await req.arrayBuffer()))
           } catch (err: unknown) {
@@ -78,7 +78,7 @@ export function registerService<T extends GenServiceMethods>(http: HttpRouter, s
             })
           } else {
             return new Response(toBinary(method.output, output as any), {
-              headers: { 'Content-Type': 'application/connect+proto' },
+              headers: { 'Content-Type': contentType },
             })
           }
         } catch (err: unknown) {
