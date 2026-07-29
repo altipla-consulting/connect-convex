@@ -29,16 +29,11 @@ export type RegisterServiceOptions = {
   interceptors?: Interceptor[]
 }
 
-type Methods<T extends GenServiceMethods> = {
+export type Methods<T extends GenServiceMethods> = {
   [K in keyof T]: (ctx: ActionCtx, input: MessageShape<T[K]['input']>, req?: Request) => Promise<MessageShape<T[K]['output']>>
 }
 
-export function registerService<T extends GenServiceMethods>(
-  http: HttpRouter,
-  service: GenService<T>,
-  impl: Methods<T>,
-  options?: RegisterServiceOptions,
-) {
+export function registerService<T extends GenServiceMethods>(http: HttpRouter, service: GenService<T>, impl: Methods<T>, options?: RegisterServiceOptions) {
   for (const method of service.methods) {
     http.route({
       method: 'POST',
