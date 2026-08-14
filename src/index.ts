@@ -27,6 +27,7 @@ export type Interceptor = (next: AnyHandler) => AnyHandler
 
 export type RegisterServiceOptions = {
   interceptors?: Interceptor[]
+  ignoreUnknownFields?: boolean
 }
 
 export type Methods<T extends GenServiceMethods> = {
@@ -44,7 +45,9 @@ export function registerService<T extends GenServiceMethods>(http: HttpRouter, s
         const contentType = req.headers.get('Content-Type')
         if (contentType === 'application/json') {
           try {
-            input = fromJsonString(method.input, await req.text())
+            input = fromJsonString(method.input, await req.text(), {
+              ignoreUnknownFields: options?.ignoreUnknownFields ?? false,
+            })
           } catch (err: unknown) {
             console.warn('invalid json body', err)
             return serializeError(ConnectError.from(err, Code.InvalidArgument))
