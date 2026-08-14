@@ -46,18 +46,18 @@ export function registerService<T extends GenServiceMethods>(http: HttpRouter, s
           try {
             input = fromJsonString(method.input, await req.text())
           } catch (err: unknown) {
-            console.warn('invalid json argument', { method, err })
+            console.warn('invalid json body', err)
             return serializeError(ConnectError.from(err, Code.InvalidArgument))
           }
         } else if (contentType === 'application/proto') {
           try {
             input = fromBinary(method.input, new Uint8Array(await req.arrayBuffer()))
           } catch (err: unknown) {
-            console.warn('invalid protobuf argument', { method, err })
+            console.warn('invalid protobuf body', err)
             return serializeError(ConnectError.from(err, Code.InvalidArgument))
           }
         } else {
-          console.warn('invalid content type', { method, contentType })
+          console.warn('unknown content type', contentType)
           return new Response(`invalid content type ${contentType}`, { status: 400 })
         }
 
