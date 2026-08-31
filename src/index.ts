@@ -31,7 +31,7 @@ export type RegisterServiceOptions = {
 }
 
 export type Methods<T extends GenServiceMethods> = {
-  [K in keyof T]: (ctx: ActionCtx, input: MessageShape<T[K]['input']>, req?: Request) => Promise<MessageShape<T[K]['output']>>
+  [K in keyof T]: (ctx: ActionCtx, input: MessageShape<T[K]['input']>, req: Request) => Promise<MessageShape<T[K]['output']>>
 }
 
 export function registerService<T extends GenServiceMethods>(http: HttpRouter, service: GenService<T>, impl: Methods<T>, options?: RegisterServiceOptions) {
