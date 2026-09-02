@@ -13,6 +13,12 @@ function serializeError(err: ConnectError) {
   })
 }
 
+function isWireError(err: ConnectError) {
+  // TODO(ernesto): Connect marks client errors with `isWireError` on main, but the field is not available in a release yet.
+  // Replace this protocol-header heuristic with `err.isWireError` once a version containing connect-es#1717 is published.
+  return err.metadata.has('content-type') || err.metadata.has('grpc-status') || err.metadata.has('grpc-status-details-bin')
+}
+
 export interface InterceptorRequest {
   service: GenService<GenServiceMethods>
   method: DescMethod
@@ -88,7 +94,7 @@ export function registerService<T extends GenServiceMethods>(http: HttpRouter, s
             })
           }
         } catch (err: unknown) {
-          if (err instanceof ConnectError) {
+          if (err instanceof ConnectError && !isWireError(err)) {
             return serializeError(err)
           }
           throw err
