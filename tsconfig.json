@@ -6,7 +6,7 @@
     "noImplicitAny": true,
     "forceConsistentCasingInFileNames": true,
     "noUncheckedIndexedAccess": false,
-    "types": []
+    "types": ["node"]
   },
   "include": ["src/**/*.ts", "build.config.ts"],
   "exclude": ["node_modules", "dist"]
