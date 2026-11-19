@@ -6,7 +6,7 @@
     "build": "obuild",
     "lint": "tsc --noEmit && oxlint",
     "fix": "oxlint --fix",
-    "test": "pnpm run lint",
+    "test": "pnpm run lint && vitest run",
     "prepublishOnly": "pnpm run build"
   },
   "description": "Register Connect services in Convex.",
@@ -33,15 +33,19 @@
   "dependencies": {
     "@bufbuild/protobuf": "^2.11.0",
     "@connectrpc/connect": "^2.1.1",
-    "convex": "^1.38.0"
+    "convex": "^1.38.0",
+    "pako": "^3.0.3"
   },
   "devDependencies": {
     "@altipla/oxlint-config": "^0.1.6",
+    "@buf/connectrpc_eliza.bufbuild_es": "2.11.0-20230913231627-233fca715f49.1",
+    "@types/node": "^26.6.6",
     "@vue/tsconfig": "^0.9.1",
     "obuild": "^0.4.37",
     "oxlint": "^1.57.0",
     "oxlint-tsgolint": "^0.23.0",
     "prettier": "^3.8.1",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^5.1.1"
   }
 }
